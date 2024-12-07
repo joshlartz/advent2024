@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::str;
 
 type Input = (Vec<usize>, Vec<usize>);
 
