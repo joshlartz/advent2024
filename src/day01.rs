@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::str;
 
 type Input = (Vec<usize>, Vec<usize>);
@@ -6,8 +7,12 @@ pub fn generator(input: &str) -> Input {
     let mut lists: Input = (vec![], vec![]);
     input.lines().for_each(|line| {
         let mut split = line.split_whitespace();
-        lists.0.push(split.next().unwrap().parse::<usize>().unwrap());
-        lists.1.push(split.next().unwrap().parse::<usize>().unwrap());
+        lists
+            .0
+            .push(split.next().unwrap().parse::<usize>().unwrap());
+        lists
+            .1
+            .push(split.next().unwrap().parse::<usize>().unwrap());
     });
     lists
 }
@@ -18,15 +23,28 @@ pub fn part1(input: &Input) -> usize {
     lists.1.sort();
 
     let mut diffs: Vec<usize> = vec![];
-    for i in 0..lists.0.len() {
-        diffs.push(lists.0[i].abs_diff(lists.1[i]));
+    for (i, left) in lists.0.iter().enumerate() {
+        diffs.push(left.abs_diff(lists.1[i]));
     }
     diffs.iter().sum()
 }
 
-// pub fn part2(input: &Input) -> usize {
-//     
-// }
+pub fn part2(input: &Input) -> usize {
+    let occurances: HashMap<usize, usize> = input.1.iter().fold(HashMap::new(), |mut acc, x| {
+        if let Some(count) = acc.get_mut(x) {
+            *count += 1;
+        } else {
+            acc.insert(*x, 1);
+        }
+        acc
+    });
+
+    input
+        .0
+        .iter()
+        .map(|each| each * occurances.get(each).unwrap_or(&0))
+        .sum()
+}
 
 #[cfg(test)]
 mod tests {
@@ -44,8 +62,8 @@ mod tests {
         assert_eq!(part1(&generator(SAMPLE)), 11);
     }
 
-    // #[test]
-    // fn test_part2() {
-    //     assert_eq!(part2(&generator(SAMPLE)), 31);
-    // }
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2(&generator(SAMPLE)), 31);
+    }
 }
