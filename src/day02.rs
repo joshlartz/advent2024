@@ -15,24 +15,53 @@ pub fn part1(input: &Input) -> usize {
     input
         .iter()
         .filter_map(|report| {
-            let asc = report.is_sorted_by(|a, b| a < b);
-            let desc = report.is_sorted_by(|a, b| b < a);
-            // rule one all increasing or decreasing
-            if !(asc || desc) {
+            if !rule1(report) {
                 return None;
             }
 
-            report
-                .windows(2)
-                .all(|pairs| (1..=3).contains(&pairs[0].abs_diff(pairs[1])))
-                .then_some(0)
+            rule2(report).then_some(0)
         })
         .count()
 }
 
-// pub fn part2(input: &Input) -> usize {
+// 317 too low
+pub fn part2(input: &Input) -> usize {
+    input
+        .iter()
+        .filter_map(|report| {
+            if rule1(report) && rule2(report) {
+                return Some(0);
+            }
 
-// }
+            // needs Problem Dampener correction
+
+            for index in 0..report.len() {
+                let mut reduced_report = report.clone();
+                reduced_report.remove(index);
+
+                if rule1(&reduced_report) && rule2(&reduced_report) {
+                    return Some(0);
+                }
+            }
+
+            None
+        })
+        .count()
+}
+
+/** all increasing or decreasing */
+fn rule1(report: &[usize]) -> bool {
+    let asc = report.is_sorted_by(|a, b| a < b);
+    let desc = report.is_sorted_by(|a, b| a > b);
+    asc || desc
+}
+
+/** changing by 1-3 */
+fn rule2(report: &[usize]) -> bool {
+    report
+        .windows(2)
+        .all(|levels| (1..=3).contains(&levels[0].abs_diff(levels[1])))
+}
 
 #[cfg(test)]
 mod tests {
@@ -50,8 +79,8 @@ mod tests {
         assert_eq!(part1(&generator(SAMPLE)), 2);
     }
 
-    // #[test]
-    // fn test_part2() {
-    //     assert_eq!(part2(&generator(SAMPLE)), 31);
-    // }
+    #[test]
+    fn test_part2() {
+        assert_eq!(part2(&generator(SAMPLE)), 4);
+    }
 }
