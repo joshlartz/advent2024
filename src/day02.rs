@@ -24,7 +24,6 @@ pub fn part1(input: &Input) -> usize {
         .count()
 }
 
-// 317 too low
 pub fn part2(input: &Input) -> usize {
     input
         .iter()
